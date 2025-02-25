@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.maxiscoding.todoer.model.RegisterRequest
-import dev.maxiscoding.todoer.model.Token
 import dev.maxiscoding.todoer.services.apiService
 import kotlinx.coroutines.launch
 
