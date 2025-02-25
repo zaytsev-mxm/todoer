@@ -21,14 +21,6 @@ class AppRootViewModel : ViewModel() {
     val appState: AppState
         get() = _appState
 
-    init {
-//        try {
-//            registerUserViaEmail()
-//        } catch (e: Exception) {
-//            println(e.message)
-//        }
-    }
-
     fun registerUserViaEmail(email: String, password: String) {
         _appState = _appState.copy(isLoading = true)
 
@@ -45,7 +37,12 @@ class AppRootViewModel : ViewModel() {
                         token = response.body()?.token
                     )
                 } else {
-                    println("Error with code: ${response.code()}")
+                    val msg = "Error with code: ${response.code()}"
+                    println(msg)
+                    _appState = _appState.copy(
+                        isLoading = false,
+                        error = msg
+                    )
                 }
             } catch (e: Exception) {
                 println("Error unknown: ${e.message}")
