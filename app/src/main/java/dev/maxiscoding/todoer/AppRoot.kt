@@ -1,6 +1,8 @@
 package dev.maxiscoding.todoer
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -19,7 +21,10 @@ fun AppRoot(viewModel: AppRootViewModel) {
 
     NavHost(navController = navController, startDestination = Screen.HomeGuest.route) {
         composable(Screen.HomeGuest.route) {
-            HomeGuest()
+            HomeGuest(
+                onLogin = { email, password -> viewModel.registerUserViaEmail(email, password) },
+                modifier = Modifier.fillMaxSize()
+            )
         }
         composable(Screen.HomeAuthorised.route) {
             HomeAuthorised()

@@ -5,43 +5,52 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.maxiscoding.todoer.model.Category
-import dev.maxiscoding.todoer.services.recipeService
-import kotlinx.coroutines.delay
+import dev.maxiscoding.todoer.model.RegisterRequest
+import dev.maxiscoding.todoer.model.Token
+import dev.maxiscoding.todoer.services.apiService
 import kotlinx.coroutines.launch
 
-data class RecipeState(
+data class AppState(
     var isLoading: Boolean = false,
-    var categories: List<Category> = listOf(),
+    val token: String? = null,
     val error: String? = null
 )
 
 class AppRootViewModel : ViewModel() {
-    private var _categoriesState by mutableStateOf(RecipeState())
-    val categoriesState: RecipeState
-        get() = _categoriesState
+    private var _appState by mutableStateOf(AppState())
+    val appState: AppState
+        get() = _appState
 
     init {
-        try {
-            fetchCategories()
-        } catch (e: Exception) {
-            println(e.message)
-        }
+//        try {
+//            registerUserViaEmail()
+//        } catch (e: Exception) {
+//            println(e.message)
+//        }
     }
 
-    private fun fetchCategories() {
-        _categoriesState = _categoriesState.copy(isLoading = true)
+    fun registerUserViaEmail(email: String, password: String) {
+        _appState = _appState.copy(isLoading = true)
 
         viewModelScope.launch {
-            delay(3000)
             try {
-                val response = recipeService.getCategories()
-                _categoriesState = _categoriesState.copy(
-                    isLoading = false,
-                    categories = response.categories
-                )
+                val request = RegisterRequest(email.trim(), login = email.trim(), password.trim())
+                val response = apiService.registerUserViaEmail(request)
+
+                if (response.isSuccessful) {
+                    println("Success")
+                    println(response)
+                    _appState = _appState.copy(
+                        isLoading = false,
+                        token = response.body()?.token
+                    )
+                } else {
+                    println("Error with code: ${response.code()}")
+                }
             } catch (e: Exception) {
-                _categoriesState = _categoriesState.copy(
+                println("Error unknown: ${e.message}")
+                println(e.message)
+                _appState = _appState.copy(
                     isLoading = false,
                     error = e.message
                 )
