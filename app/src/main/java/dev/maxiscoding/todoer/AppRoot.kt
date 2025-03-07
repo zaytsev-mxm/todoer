@@ -22,12 +22,19 @@ fun AppRoot(viewModel: AppRootViewModel) {
     NavHost(navController = navController, startDestination = Screen.HomeGuest.route) {
         composable(Screen.HomeGuest.route) {
             HomeGuest(
-                onLogin = { email, password -> viewModel.registerUserViaEmail(email, password) },
+                onLogin = { login, password ->
+                    viewModel.loginUserViaEmail(
+                        login,
+                        password,
+                        { success -> if (success) navController.navigate(Screen.HomeAuthorised.route) })
+                },
+                onRegister = { email, password -> viewModel.registerUserViaEmail(email, password) },
+                isLoading = viewModel.uiState.isLoading,
                 modifier = Modifier.fillMaxSize()
             )
         }
         composable(Screen.HomeAuthorised.route) {
-            HomeAuthorised()
+            HomeAuthorised(modifier = Modifier.fillMaxSize())
         }
     }
 }

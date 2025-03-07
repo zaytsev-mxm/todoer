@@ -1,5 +1,6 @@
 package dev.maxiscoding.todoer.services
 
+import dev.maxiscoding.todoer.model.LoginRequest
 import dev.maxiscoding.todoer.model.RegisterRequest
 import dev.maxiscoding.todoer.model.TokenResponse
 import retrofit2.Retrofit
@@ -19,4 +20,7 @@ val apiService: ApiService = retrofit.create(ApiService::class.java)
 interface ApiService {
     @POST("register")
     suspend fun registerUserViaEmail(@Body request: RegisterRequest): Response<TokenResponse>
+
+    @POST("login")
+    suspend fun loginUserViaEmail(@Body request: LoginRequest): Response<TokenResponse>
 }
