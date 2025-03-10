@@ -60,7 +60,7 @@ class AppRootViewModel : ViewModel() {
         }
     }
 
-    fun loginUserViaEmail(login: String, password: String, onFinish: (success: Boolean) -> Unit) {
+    fun loginUserViaEmail(login: String, password: String, onFinish: (success: Boolean) -> Unit = {}) {
         uiState = uiState.copy(isLoading = true)
 
         viewModelScope.launch {
@@ -95,5 +95,9 @@ class AppRootViewModel : ViewModel() {
                 onFinish(false)
             }
         }
+    }
+
+    fun logout() {
+        uiState = uiState.copy(token = null)
     }
 }

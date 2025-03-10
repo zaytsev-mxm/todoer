@@ -4,11 +4,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,22 +18,34 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import dev.maxiscoding.todoer.Screen
+import dev.maxiscoding.todoer.vms.AppRootViewModel
+import dev.maxiscoding.todoer.vms.isLoggedIn
 
 @Composable
 fun HomeGuest(
-    onLogin: (String, String) -> Unit,
-    onRegister: (String, String) -> Unit,
-    isLoading: Boolean,
-    modifier: Modifier = Modifier
+    navController: NavController,
+    viewModel: AppRootViewModel = viewModel()
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var wantsToRegister by remember { mutableStateOf(false) }
 
+    val isLoggedIn by viewModel.uiState::isLoggedIn
+    val isLoading = viewModel.uiState.isLoading
+
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn) {
+            navController.navigate(Screen.HomeAuthorised.route)
+        }
+    }
+
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
+        modifier = Modifier.fillMaxSize()
     ) {
         Text("Home Screen Guest")
         Spacer(modifier = Modifier.height(16.dp))
@@ -50,7 +64,12 @@ fun HomeGuest(
                     label = { Text("Password") }
                 )
                 Spacer(modifier = Modifier.height(32.dp))
-                Button(onClick = { onRegister(email, password) }, enabled = !isLoading) {
+                Button(onClick = {
+                    viewModel.registerUserViaEmail(
+                        email,
+                        password
+                    )
+                }, enabled = !isLoading) {
                     Text("Register")
                 }
                 Spacer(modifier = Modifier.height(16.dp))
@@ -74,7 +93,12 @@ fun HomeGuest(
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 Button(
-                    onClick = { onLogin(email, password) },
+                    onClick = {
+                        viewModel.loginUserViaEmail(
+                            email,
+                            password,
+                        )
+                    },
                     enabled = !isLoading
                 ) {
                     Text("Login")

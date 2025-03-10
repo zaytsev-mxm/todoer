@@ -1,14 +1,14 @@
 package dev.maxiscoding.todoer
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dev.maxiscoding.todoer.screens.HomeGuest
 import dev.maxiscoding.todoer.screens.HomeAuthorised
 import dev.maxiscoding.todoer.vms.AppRootViewModel
+import dev.maxiscoding.todoer.vms.isLoggedIn
 
 sealed class Screen(val route: String) {
     data object HomeGuest : Screen("HomeGuest")
@@ -18,23 +18,20 @@ sealed class Screen(val route: String) {
 @Composable
 fun AppRoot(viewModel: AppRootViewModel) {
     val navController = rememberNavController()
+    val isLoggedIn by viewModel.uiState::isLoggedIn
+
+    LaunchedEffect(isLoggedIn) {
+        if (!isLoggedIn) {
+            navController.navigate(Screen.HomeGuest.route)
+        }
+    }
 
     NavHost(navController = navController, startDestination = Screen.HomeGuest.route) {
         composable(Screen.HomeGuest.route) {
-            HomeGuest(
-                onLogin = { login, password ->
-                    viewModel.loginUserViaEmail(
-                        login,
-                        password,
-                        { success -> if (success) navController.navigate(Screen.HomeAuthorised.route) })
-                },
-                onRegister = { email, password -> viewModel.registerUserViaEmail(email, password) },
-                isLoading = viewModel.uiState.isLoading,
-                modifier = Modifier.fillMaxSize()
-            )
+            HomeGuest(navController, viewModel)
         }
         composable(Screen.HomeAuthorised.route) {
-            HomeAuthorised(modifier = Modifier.fillMaxSize())
+            HomeAuthorised(viewModel)
         }
     }
 }
