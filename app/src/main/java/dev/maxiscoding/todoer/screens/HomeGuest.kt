@@ -15,6 +15,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.maxiscoding.todoer.Screen
 import dev.maxiscoding.todoer.components.authorisation.LoginView
@@ -24,9 +25,9 @@ import dev.maxiscoding.todoer.vms.isLoggedIn
 
 @Composable
 fun HomeGuest(
-    navController: NavController,
-    viewModel: AppRootViewModel
+    navController: NavController
 ) {
+    val viewModel: AppRootViewModel = hiltViewModel()
     var wantsToRegister by rememberSaveable { mutableStateOf(false) }
 
     val isLoggedIn by viewModel.uiState::isLoggedIn

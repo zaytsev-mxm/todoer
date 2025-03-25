@@ -2,6 +2,7 @@ package dev.maxiscoding.todoer
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -16,7 +17,7 @@ sealed class Screen(val route: String) {
 }
 
 @Composable
-fun AppRoot(viewModel: AppRootViewModel) {
+fun AppRoot(viewModel: AppRootViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val isLoggedIn by viewModel.uiState::isLoggedIn
 
@@ -28,10 +29,10 @@ fun AppRoot(viewModel: AppRootViewModel) {
 
     NavHost(navController = navController, startDestination = Screen.HomeGuest.route) {
         composable(Screen.HomeGuest.route) {
-            HomeGuest(navController, viewModel)
+            HomeGuest(navController)
         }
         composable(Screen.HomeAuthorised.route) {
-            HomeAuthorised(viewModel)
+            HomeAuthorised()
         }
     }
 }

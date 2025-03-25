@@ -3,12 +3,15 @@ package dev.maxiscoding.todoer.vms
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.maxiscoding.todoer.model.LoginRequest
 import dev.maxiscoding.todoer.model.RegisterRequest
 import dev.maxiscoding.todoer.services.apiService
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class AppState(
     var isLoading: Boolean = false,
@@ -18,9 +21,23 @@ data class AppState(
 
 val AppState.isLoggedIn: Boolean get() = token != null && error == null
 
-class AppRootViewModel : ViewModel() {
+@HiltViewModel
+class AppRootViewModel @Inject constructor(private val savedStateHandle: SavedStateHandle) :
+    ViewModel() {
+
+    val token = savedStateHandle.getStateFlow("token", "")
+
+
     var uiState by mutableStateOf(AppState())
         private set
+
+    fun saveToken(newToken: String) {
+        savedStateHandle["token"] = newToken
+    }
+
+    fun removeToken() {
+        savedStateHandle.remove<String>("token")
+    }
 
     fun registerUserViaEmail(email: String, password: String, login: String? = null) {
         uiState = uiState.copy(isLoading = true)
@@ -37,10 +54,12 @@ class AppRootViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     println("Success")
                     println(response)
+                    val token = response.body()?.token
                     uiState = uiState.copy(
                         isLoading = false,
-                        token = response.body()?.token
+                        token = token
                     )
+                    saveToken(token ?: "")
                 } else {
                     val msg = "Error with code: ${response.code()}"
                     println(msg)
@@ -60,7 +79,11 @@ class AppRootViewModel : ViewModel() {
         }
     }
 
-    fun loginUserViaEmail(login: String, password: String, onFinish: (success: Boolean) -> Unit = {}) {
+    fun loginUserViaEmail(
+        login: String,
+        password: String,
+        onFinish: (success: Boolean) -> Unit = {}
+    ) {
         uiState = uiState.copy(isLoading = true)
 
         viewModelScope.launch {
@@ -99,5 +122,6 @@ class AppRootViewModel : ViewModel() {
 
     fun logout() {
         uiState = uiState.copy(token = null)
+        removeToken()
     }
 }

@@ -11,10 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import dev.maxiscoding.todoer.vms.AppRootViewModel
 
 @Composable
-fun HomeAuthorised(viewModel: AppRootViewModel) {
+fun HomeAuthorised() {
+    val viewModel: AppRootViewModel = hiltViewModel()
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
