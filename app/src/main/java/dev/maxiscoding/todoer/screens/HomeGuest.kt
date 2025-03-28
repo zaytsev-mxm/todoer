@@ -17,28 +17,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import dev.maxiscoding.todoer.Screen
 import dev.maxiscoding.todoer.components.authorisation.LoginView
 import dev.maxiscoding.todoer.components.authorisation.RegisterView
-import dev.maxiscoding.todoer.AppRootViewModel
-import dev.maxiscoding.todoer.isLoggedIn
 
 @Composable
 fun HomeGuest(
-    navController: NavController,
-    viewModel: AppRootViewModel
+    isLoggedIn: Boolean,
+    isLoading: Boolean,
+    onLoggedIn: () -> Unit,
+    onLogin: (login: String, password: String, cb: (success: Boolean) -> Unit) -> Unit,
+    onRegister: (email: String, password: String, login: String?, cb: (success: Boolean) -> Unit) -> Unit,
 ) {
     var wantsToRegister by rememberSaveable { mutableStateOf(false) }
 
     val myContext = LocalContext.current
 
-    val isLoggedIn by viewModel.uiState::isLoggedIn
-    val isLoading = viewModel.uiState.isLoading
-
     LaunchedEffect(isLoggedIn) {
         if (isLoggedIn) {
-            navController.navigate(Screen.HomeAuthorised.route)
+            onLoggedIn.invoke()
         }
     }
 
@@ -52,7 +48,7 @@ fun HomeGuest(
         when {
             wantsToRegister -> RegisterView(
                 onRegister = { email, password ->
-                    viewModel.registerUserViaEmail(email, password) { success ->
+                    onRegister(email, password, email) { success ->
                         val msg = if (success) "Logged in successfully" else "Login failed"
                         Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show()
                     }
@@ -63,7 +59,7 @@ fun HomeGuest(
 
             else -> LoginView(
                 onLogin = { login, password ->
-                    viewModel.loginUserViaEmail(login, password) { success ->
+                    onLogin(login, password) { success ->
                         val msg = if (success) "Logged in successfully" else "Login failed"
                         Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show()
                     }

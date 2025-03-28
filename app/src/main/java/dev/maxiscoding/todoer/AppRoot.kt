@@ -17,7 +17,9 @@ sealed class Screen(val route: String) {
 @Composable
 fun AppRoot(viewModel: AppRootViewModel = hiltViewModel()) {
     val navController = rememberNavController()
-    val isLoggedIn by viewModel.uiState::isLoggedIn
+    val uiState = viewModel.uiState
+    val isLoggedIn by uiState::isLoggedIn
+    val token by uiState::token
 
     LaunchedEffect(isLoggedIn) {
         if (!isLoggedIn) {
@@ -27,10 +29,16 @@ fun AppRoot(viewModel: AppRootViewModel = hiltViewModel()) {
 
     NavHost(navController = navController, startDestination = Screen.HomeGuest.route) {
         composable(Screen.HomeGuest.route) {
-            HomeGuest(navController, viewModel)
+            HomeGuest(
+                isLoggedIn = isLoggedIn,
+                isLoading = uiState.isLoading,
+                onLoggedIn = { navController.navigate(Screen.HomeAuthorised.route) },
+                onLogin = viewModel::loginUserViaEmail,
+                onRegister = viewModel::registerUserViaEmail
+            )
         }
         composable(Screen.HomeAuthorised.route) {
-            HomeAuthorised(viewModel)
+            HomeAuthorised(token = token, onLogout = viewModel::logout)
         }
     }
 }

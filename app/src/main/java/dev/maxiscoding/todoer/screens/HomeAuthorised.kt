@@ -11,10 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.maxiscoding.todoer.AppRootViewModel
 
 @Composable
-fun HomeAuthorised(viewModel: AppRootViewModel) {
+fun HomeAuthorised(token: String?, onLogout: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -22,9 +21,9 @@ fun HomeAuthorised(viewModel: AppRootViewModel) {
     ) {
         Text("Home Screen Authorised")
         Spacer(modifier = Modifier.height(32.dp))
-        Text("Token is ${viewModel.uiState.token}")
+        Text("Token is ${token}")
         Spacer(modifier = Modifier.height(32.dp))
-        Button(onClick = { viewModel.logout() }) {
+        Button(onClick = { onLogout.invoke() }) {
             Text("Logout")
         }
     }
