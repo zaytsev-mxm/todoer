@@ -20,8 +20,8 @@ import androidx.navigation.NavController
 import dev.maxiscoding.todoer.Screen
 import dev.maxiscoding.todoer.components.authorisation.LoginView
 import dev.maxiscoding.todoer.components.authorisation.RegisterView
-import dev.maxiscoding.todoer.vms.AppRootViewModel
-import dev.maxiscoding.todoer.vms.isLoggedIn
+import dev.maxiscoding.todoer.AppRootViewModel
+import dev.maxiscoding.todoer.isLoggedIn
 
 @Composable
 fun HomeGuest(
@@ -52,7 +52,6 @@ fun HomeGuest(
                 onLogin = { wantsToRegister = false },
                 isLoading = isLoading
             )
-
             else -> LoginView(
                 onLogin = { login, password -> viewModel.loginUserViaEmail(login, password) },
                 onRegister = { wantsToRegister = true },

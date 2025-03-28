@@ -8,8 +8,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dev.maxiscoding.todoer.screens.HomeGuest
 import dev.maxiscoding.todoer.screens.HomeAuthorised
-import dev.maxiscoding.todoer.vms.AppRootViewModel
-import dev.maxiscoding.todoer.vms.isLoggedIn
 
 sealed class Screen(val route: String) {
     data object HomeGuest : Screen("HomeGuest")

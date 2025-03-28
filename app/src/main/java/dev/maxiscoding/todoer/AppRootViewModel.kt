@@ -1,9 +1,8 @@
-package dev.maxiscoding.todoer.vms
+package dev.maxiscoding.todoer
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,22 +21,9 @@ data class AppState(
 val AppState.isLoggedIn: Boolean get() = token != null && error == null
 
 @HiltViewModel
-class AppRootViewModel @Inject constructor(private val savedStateHandle: SavedStateHandle) :
-    ViewModel() {
-
-    val token = savedStateHandle.getStateFlow("token", "")
-
-
+class AppRootViewModel @Inject constructor() : ViewModel() {
     var uiState by mutableStateOf(AppState())
         private set
-
-    fun saveToken(newToken: String) {
-        savedStateHandle["token"] = newToken
-    }
-
-    fun removeToken() {
-        savedStateHandle.remove<String>("token")
-    }
 
     fun registerUserViaEmail(email: String, password: String, login: String? = null) {
         uiState = uiState.copy(isLoading = true)
@@ -59,7 +45,6 @@ class AppRootViewModel @Inject constructor(private val savedStateHandle: SavedSt
                         isLoading = false,
                         token = token
                     )
-                    saveToken(token ?: "")
                 } else {
                     val msg = "Error with code: ${response.code()}"
                     println(msg)
@@ -122,6 +107,5 @@ class AppRootViewModel @Inject constructor(private val savedStateHandle: SavedSt
 
     fun logout() {
         uiState = uiState.copy(token = null)
-        removeToken()
     }
 }
