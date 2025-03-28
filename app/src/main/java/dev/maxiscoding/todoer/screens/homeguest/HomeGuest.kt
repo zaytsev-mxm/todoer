@@ -21,9 +21,9 @@ import dev.maxiscoding.todoer.isLoggedIn
 
 @Composable
 fun HomeGuest(
+    homeGuestViewModel: HomeGuestViewModel = hiltViewModel(),
     onLoggedIn: () -> Unit
 ) {
-    val homeGuestViewModel: HomeGuestViewModel = hiltViewModel()
     val viewModel = LocalAppViewModel.current
     val uiState = viewModel.uiState
     val isLoggedIn = uiState.isLoggedIn

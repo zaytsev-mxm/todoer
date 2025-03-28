@@ -8,8 +8,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dev.maxiscoding.todoer.screens.debug.Debug
+import dev.maxiscoding.todoer.screens.debug.DebugViewModel
 import dev.maxiscoding.todoer.screens.homeguest.HomeGuest
 import dev.maxiscoding.todoer.screens.homeauth.HomeAuthorised
+import dev.maxiscoding.todoer.screens.homeguest.HomeGuestViewModel
 
 sealed class Screen(val route: String) {
     data object HomeGuest : Screen("HomeGuest")
@@ -17,11 +19,14 @@ sealed class Screen(val route: String) {
     data object Debug : Screen("Debug")
 }
 
-val DefaultRoute = Screen.Debug.route
+val DefaultRoute = Screen.HomeGuest.route
 
 @Composable
 fun AppRoot() {
     val viewModel: AppViewModel = hiltViewModel()
+
+    val homeGuestViewModel: HomeGuestViewModel = hiltViewModel()
+    val debugViewModel: DebugViewModel = hiltViewModel()
 
     val navController = rememberNavController()
     val uiState = viewModel.uiState
@@ -39,15 +44,15 @@ fun AppRoot() {
     ) {
         NavHost(navController = navController, startDestination = DefaultRoute) {
             composable(Screen.HomeGuest.route) {
-                HomeGuest(
-                    onLoggedIn = { navController.navigate(Screen.HomeAuthorised.route) },
-                )
+                HomeGuest(homeGuestViewModel) {
+                    navController.navigate(Screen.HomeAuthorised.route)
+                }
             }
             composable(Screen.HomeAuthorised.route) {
                 HomeAuthorised()
             }
             composable(Screen.Debug.route) {
-                Debug()
+                Debug(debugViewModel)
             }
         }
     }
