@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.maxiscoding.todoer.model.LoginRequest
 import dev.maxiscoding.todoer.model.RegisterRequest
-import dev.maxiscoding.todoer.services.apiService
+import dev.maxiscoding.todoer.repository.AuthRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,7 +21,9 @@ data class AppState(
 val AppState.isLoggedIn: Boolean get() = token != null && error == null
 
 @HiltViewModel
-class AppRootViewModel @Inject constructor() : ViewModel() {
+class AppRootViewModel @Inject constructor(
+    private val authRepository: AuthRepository
+) : ViewModel() {
     var uiState by mutableStateOf(AppState())
         private set
 
@@ -35,7 +37,7 @@ class AppRootViewModel @Inject constructor() : ViewModel() {
                     login = login ?: email.trim(),
                     password = password.trim()
                 )
-                val response = apiService.registerUserViaEmail(request)
+                val response = authRepository.registerUserViaEmail(request)
 
                 if (response.isSuccessful) {
                     println("Success")
@@ -74,7 +76,7 @@ class AppRootViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             try {
                 val request = LoginRequest(login.trim(), password.trim())
-                val response = apiService.loginUserViaEmail(request)
+                val response = authRepository.loginUserViaEmail(request)
 
                 if (response.isSuccessful) {
                     println("Success")
