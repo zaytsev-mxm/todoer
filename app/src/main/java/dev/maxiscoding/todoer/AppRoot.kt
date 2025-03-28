@@ -27,10 +27,10 @@ fun AppRoot(viewModel: AppRootViewModel = hiltViewModel()) {
 
     NavHost(navController = navController, startDestination = Screen.HomeGuest.route) {
         composable(Screen.HomeGuest.route) {
-            HomeGuest(navController)
+            HomeGuest(navController, viewModel)
         }
         composable(Screen.HomeAuthorised.route) {
-            HomeAuthorised()
+            HomeAuthorised(viewModel)
         }
     }
 }

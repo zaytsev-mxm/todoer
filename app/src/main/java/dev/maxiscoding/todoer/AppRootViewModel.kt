@@ -27,7 +27,12 @@ class AppRootViewModel @Inject constructor(
     var uiState by mutableStateOf(AppState())
         private set
 
-    fun registerUserViaEmail(email: String, password: String, login: String? = null) {
+    fun registerUserViaEmail(
+        email: String,
+        password: String,
+        login: String? = null,
+        onFinish: (success: Boolean) -> Unit = {}
+    ) {
         uiState = uiState.copy(isLoading = true)
 
         viewModelScope.launch {
@@ -47,6 +52,7 @@ class AppRootViewModel @Inject constructor(
                         isLoading = false,
                         token = token
                     )
+                    onFinish(true)
                 } else {
                     val msg = "Error with code: ${response.code()}"
                     println(msg)
@@ -54,6 +60,7 @@ class AppRootViewModel @Inject constructor(
                         isLoading = false,
                         error = msg
                     )
+                    onFinish(false)
                 }
             } catch (e: Exception) {
                 println("Error unknown: ${e.message}")
@@ -62,6 +69,7 @@ class AppRootViewModel @Inject constructor(
                     isLoading = false,
                     error = e.message
                 )
+                onFinish(false)
             }
         }
     }

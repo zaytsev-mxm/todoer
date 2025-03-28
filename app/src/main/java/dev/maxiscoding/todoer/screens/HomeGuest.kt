@@ -1,5 +1,6 @@
 package dev.maxiscoding.todoer.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,8 +15,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.maxiscoding.todoer.Screen
 import dev.maxiscoding.todoer.components.authorisation.LoginView
@@ -25,10 +26,12 @@ import dev.maxiscoding.todoer.isLoggedIn
 
 @Composable
 fun HomeGuest(
-    navController: NavController
+    navController: NavController,
+    viewModel: AppRootViewModel
 ) {
-    val viewModel: AppRootViewModel = hiltViewModel()
     var wantsToRegister by rememberSaveable { mutableStateOf(false) }
+
+    val myContext = LocalContext.current
 
     val isLoggedIn by viewModel.uiState::isLoggedIn
     val isLoading = viewModel.uiState.isLoading
@@ -48,12 +51,23 @@ fun HomeGuest(
         Spacer(modifier = Modifier.height(16.dp))
         when {
             wantsToRegister -> RegisterView(
-                onRegister = { email, password -> viewModel.registerUserViaEmail(email, password) },
+                onRegister = { email, password ->
+                    viewModel.registerUserViaEmail(email, password) { success ->
+                        val msg = if (success) "Logged in successfully" else "Login failed"
+                        Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show()
+                    }
+                },
                 onLogin = { wantsToRegister = false },
                 isLoading = isLoading
             )
+
             else -> LoginView(
-                onLogin = { login, password -> viewModel.loginUserViaEmail(login, password) },
+                onLogin = { login, password ->
+                    viewModel.loginUserViaEmail(login, password) { success ->
+                        val msg = if (success) "Logged in successfully" else "Login failed"
+                        Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show()
+                    }
+                },
                 onRegister = { wantsToRegister = true },
                 isLoading = isLoading
             )
