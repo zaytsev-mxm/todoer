@@ -1,4 +1,4 @@
-package dev.maxiscoding.todoer.screens
+package dev.maxiscoding.todoer.screens.homeguest
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -19,15 +19,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import dev.maxiscoding.todoer.components.authorisation.LoginView
 import dev.maxiscoding.todoer.components.authorisation.RegisterView
+import dev.maxiscoding.todoer.LocalAppViewModel
+import dev.maxiscoding.todoer.isLoggedIn
 
 @Composable
 fun HomeGuest(
-    isLoggedIn: Boolean,
-    isLoading: Boolean,
     onLoggedIn: () -> Unit,
-    onLogin: (login: String, password: String, cb: (success: Boolean) -> Unit) -> Unit,
-    onRegister: (email: String, password: String, login: String?, cb: (success: Boolean) -> Unit) -> Unit,
 ) {
+    val viewModel = LocalAppViewModel.current
+    val uiState = viewModel.uiState
+    val isLoggedIn = uiState.isLoggedIn
+    val isLoading = uiState.isLoading
+
     var wantsToRegister by rememberSaveable { mutableStateOf(false) }
 
     val myContext = LocalContext.current
@@ -48,7 +51,7 @@ fun HomeGuest(
         when {
             wantsToRegister -> RegisterView(
                 onRegister = { email, password ->
-                    onRegister(email, password, email) { success ->
+                    viewModel.registerUserViaEmail(email, password, email) { success ->
                         val msg = if (success) "Logged in successfully" else "Login failed"
                         Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show()
                     }
@@ -59,7 +62,7 @@ fun HomeGuest(
 
             else -> LoginView(
                 onLogin = { login, password ->
-                    onLogin(login, password) { success ->
+                    viewModel.loginUserViaEmail(login, password) { success ->
                         val msg = if (success) "Logged in successfully" else "Login failed"
                         Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show()
                     }

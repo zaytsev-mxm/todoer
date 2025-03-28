@@ -1,13 +1,14 @@
 package dev.maxiscoding.todoer
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import dev.maxiscoding.todoer.screens.HomeGuest
-import dev.maxiscoding.todoer.screens.HomeAuthorised
+import dev.maxiscoding.todoer.screens.homeguest.HomeGuest
+import dev.maxiscoding.todoer.screens.homeauth.HomeAuthorised
 
 sealed class Screen(val route: String) {
     data object HomeGuest : Screen("HomeGuest")
@@ -15,11 +16,12 @@ sealed class Screen(val route: String) {
 }
 
 @Composable
-fun AppRoot(viewModel: AppRootViewModel = hiltViewModel()) {
+fun AppRoot() {
+    val viewModel: AppViewModel = hiltViewModel()
+
     val navController = rememberNavController()
     val uiState = viewModel.uiState
     val isLoggedIn by uiState::isLoggedIn
-    val token by uiState::token
 
     LaunchedEffect(isLoggedIn) {
         if (!isLoggedIn) {
@@ -27,18 +29,19 @@ fun AppRoot(viewModel: AppRootViewModel = hiltViewModel()) {
         }
     }
 
-    NavHost(navController = navController, startDestination = Screen.HomeGuest.route) {
-        composable(Screen.HomeGuest.route) {
-            HomeGuest(
-                isLoggedIn = isLoggedIn,
-                isLoading = uiState.isLoading,
-                onLoggedIn = { navController.navigate(Screen.HomeAuthorised.route) },
-                onLogin = viewModel::loginUserViaEmail,
-                onRegister = viewModel::registerUserViaEmail
-            )
-        }
-        composable(Screen.HomeAuthorised.route) {
-            HomeAuthorised(token = token, onLogout = viewModel::logout)
+
+    CompositionLocalProvider(
+        LocalAppViewModel provides viewModel
+    ) {
+        NavHost(navController = navController, startDestination = Screen.HomeGuest.route) {
+            composable(Screen.HomeGuest.route) {
+                HomeGuest(
+                    onLoggedIn = { navController.navigate(Screen.HomeAuthorised.route) },
+                )
+            }
+            composable(Screen.HomeAuthorised.route) {
+                HomeAuthorised()
+            }
         }
     }
 }

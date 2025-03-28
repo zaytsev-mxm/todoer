@@ -21,7 +21,7 @@ data class AppState(
 val AppState.isLoggedIn: Boolean get() = token != null && error == null
 
 @HiltViewModel
-class AppRootViewModel @Inject constructor(
+class AppViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
     var uiState by mutableStateOf(AppState())
