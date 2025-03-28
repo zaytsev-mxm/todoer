@@ -7,13 +7,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import dev.maxiscoding.todoer.screens.debug.Debug
 import dev.maxiscoding.todoer.screens.homeguest.HomeGuest
 import dev.maxiscoding.todoer.screens.homeauth.HomeAuthorised
 
 sealed class Screen(val route: String) {
     data object HomeGuest : Screen("HomeGuest")
     data object HomeAuthorised : Screen("HomeAuthorised")
+    data object Debug : Screen("Debug")
 }
+
+val DefaultRoute = Screen.Debug.route
 
 @Composable
 fun AppRoot() {
@@ -25,7 +29,7 @@ fun AppRoot() {
 
     LaunchedEffect(isLoggedIn) {
         if (!isLoggedIn) {
-            navController.navigate(Screen.HomeGuest.route)
+            navController.navigate(DefaultRoute)
         }
     }
 
@@ -33,7 +37,7 @@ fun AppRoot() {
     CompositionLocalProvider(
         LocalAppViewModel provides viewModel
     ) {
-        NavHost(navController = navController, startDestination = Screen.HomeGuest.route) {
+        NavHost(navController = navController, startDestination = DefaultRoute) {
             composable(Screen.HomeGuest.route) {
                 HomeGuest(
                     onLoggedIn = { navController.navigate(Screen.HomeAuthorised.route) },
@@ -41,6 +45,9 @@ fun AppRoot() {
             }
             composable(Screen.HomeAuthorised.route) {
                 HomeAuthorised()
+            }
+            composable(Screen.Debug.route) {
+                Debug()
             }
         }
     }
