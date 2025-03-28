@@ -31,7 +31,7 @@ class AppViewModel @Inject constructor(
         email: String,
         password: String,
         login: String? = null,
-        onFinish: (success: Boolean) -> Unit = {}
+        onFinish: (e: Exception?) -> Unit = {}
     ) {
         uiState = uiState.copy(isLoading = true)
 
@@ -52,7 +52,7 @@ class AppViewModel @Inject constructor(
                         isLoading = false,
                         token = token
                     )
-                    onFinish(true)
+                    onFinish(null)
                 } else {
                     val msg = "Error with code: ${response.code()}"
                     println(msg)
@@ -60,7 +60,7 @@ class AppViewModel @Inject constructor(
                         isLoading = false,
                         error = msg
                     )
-                    onFinish(false)
+                    onFinish(Exception("web error: $msg"))
                 }
             } catch (e: Exception) {
                 println("Error unknown: ${e.message}")
@@ -69,7 +69,7 @@ class AppViewModel @Inject constructor(
                     isLoading = false,
                     error = e.message
                 )
-                onFinish(false)
+                onFinish(e)
             }
         }
     }
@@ -77,7 +77,7 @@ class AppViewModel @Inject constructor(
     fun loginUserViaEmail(
         login: String,
         password: String,
-        onFinish: (success: Boolean) -> Unit = {}
+        onFinish: (e: Exception?) -> Unit = {}
     ) {
         uiState = uiState.copy(isLoading = true)
 
@@ -93,7 +93,7 @@ class AppViewModel @Inject constructor(
                         isLoading = false,
                         token = response.body()?.token
                     )
-                    onFinish(true)
+                    onFinish(null)
                 } else {
                     val msg = "Error with code: ${response.code()}"
                     println(msg)
@@ -101,7 +101,7 @@ class AppViewModel @Inject constructor(
                         isLoading = false,
                         error = msg
                     )
-                    onFinish(false)
+                    onFinish(Exception("web error: $msg"))
                 }
             } catch (e: Exception) {
                 println("Error unknown: ${e.message}")
@@ -110,7 +110,7 @@ class AppViewModel @Inject constructor(
                     isLoading = false,
                     error = e.message
                 )
-                onFinish(false)
+                onFinish(e)
             }
         }
     }

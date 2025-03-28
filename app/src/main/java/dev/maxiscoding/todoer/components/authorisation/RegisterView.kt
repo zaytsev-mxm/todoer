@@ -8,29 +8,33 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import dev.maxiscoding.todoer.screens.homeguest.HomeGuestViewModel
 
 @Composable
-fun RegisterView(onRegister: (String, String) -> Unit, onLogin: () -> Unit, isLoading: Boolean) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
+fun RegisterView(
+    vm: HomeGuestViewModel = hiltViewModel(),
+    onRegister: (String, String) -> Unit,
+    isLoading: Boolean
+) {
+    val uiState = vm.uiState
+    val registerForm = uiState.registerForm
+    val email = registerForm.email
+    val password = registerForm.password
 
     Column {
         Text("Register")
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = { vm.updateRegisterForm(registerForm.copy(email = it)) },
             label = { Text("Email") }
         )
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = { vm.updateRegisterForm(registerForm.copy(password = it)) },
             label = { Text("Password") }
         )
         Spacer(modifier = Modifier.height(32.dp))
@@ -40,6 +44,6 @@ fun RegisterView(onRegister: (String, String) -> Unit, onLogin: () -> Unit, isLo
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Already have an account? Login",
-            modifier = Modifier.clickable { onLogin() })
+            modifier = Modifier.clickable { vm.toggleWantsToRegister() })
     }
 }

@@ -24,8 +24,8 @@ fun HomeGuest(
     homeGuestViewModel: HomeGuestViewModel = hiltViewModel(),
     onLoggedIn: () -> Unit
 ) {
-    val viewModel = LocalAppViewModel.current
-    val uiState = viewModel.uiState
+    val vm = LocalAppViewModel.current
+    val uiState = vm.uiState
     val isLoggedIn = uiState.isLoggedIn
     val isLoading = uiState.isLoading
 
@@ -48,24 +48,24 @@ fun HomeGuest(
         Spacer(modifier = Modifier.height(16.dp))
         when {
             homeGuestUiState.wantsToRegister -> RegisterView(
+                vm = homeGuestViewModel,
                 onRegister = { email, password ->
-                    viewModel.registerUserViaEmail(email, password, email) { success ->
-                        val msg = if (success) "Logged in successfully" else "Login failed"
+                    vm.registerUserViaEmail(email, password, email) { error ->
+                        val msg = if (error == null) "Logged in successfully" else "Login failed: ${error.message}"
                         Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show()
                     }
                 },
-                onLogin = { homeGuestViewModel.toggleWantsToRegister() },
                 isLoading = isLoading
             )
 
             else -> LoginView(
+                vm = homeGuestViewModel,
                 onLogin = { login, password ->
-                    viewModel.loginUserViaEmail(login, password) { success ->
-                        val msg = if (success) "Logged in successfully" else "Login failed"
+                    vm.loginUserViaEmail(login, password) { error ->
+                        val msg = if (error == null) "Logged in successfully" else "Login failed: ${error.message}"
                         Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show()
                     }
                 },
-                onRegister = { homeGuestViewModel.toggleWantsToRegister() },
                 isLoading = isLoading
             )
         }

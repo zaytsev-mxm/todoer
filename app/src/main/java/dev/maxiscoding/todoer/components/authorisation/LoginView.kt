@@ -8,29 +8,33 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import dev.maxiscoding.todoer.screens.homeguest.HomeGuestViewModel
 
 @Composable
-fun LoginView(onLogin: (String, String) -> Unit, onRegister: () -> Unit, isLoading: Boolean) {
-    var login by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
+fun LoginView(
+    vm: HomeGuestViewModel = hiltViewModel(),
+    onLogin: (String, String) -> Unit,
+    isLoading: Boolean
+) {
+    val uiState = vm.uiState
+    val loginForm = uiState.loginForm
+    val login = loginForm.login
+    val password = loginForm.password
 
     Column {
         Text("Login")
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = login,
-            onValueChange = { login = it },
+            onValueChange = { vm.updateLoginForm(loginForm.copy(login = it)) },
             label = { Text("Login or email") }
         )
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = { vm.updateLoginForm(loginForm.copy(password = it)) },
             label = { Text("Password") }
         )
         Spacer(modifier = Modifier.height(32.dp))
@@ -43,6 +47,6 @@ fun LoginView(onLogin: (String, String) -> Unit, onRegister: () -> Unit, isLoadi
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Do not have an account? Register",
-            modifier = Modifier.clickable { onRegister() })
+            modifier = Modifier.clickable { vm.toggleWantsToRegister() })
     }
 }
