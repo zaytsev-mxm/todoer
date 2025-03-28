@@ -9,14 +9,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import dev.maxiscoding.todoer.components.authorisation.LoginView
 import dev.maxiscoding.todoer.components.authorisation.RegisterView
 import dev.maxiscoding.todoer.LocalAppViewModel
@@ -24,14 +21,15 @@ import dev.maxiscoding.todoer.isLoggedIn
 
 @Composable
 fun HomeGuest(
-    onLoggedIn: () -> Unit,
+    onLoggedIn: () -> Unit
 ) {
+    val homeGuestViewModel: HomeGuestViewModel = hiltViewModel()
     val viewModel = LocalAppViewModel.current
     val uiState = viewModel.uiState
     val isLoggedIn = uiState.isLoggedIn
     val isLoading = uiState.isLoading
 
-    var wantsToRegister by rememberSaveable { mutableStateOf(false) }
+    val homeGuestUiState = homeGuestViewModel.uiState
 
     val myContext = LocalContext.current
 
@@ -49,14 +47,14 @@ fun HomeGuest(
         Text("Home Screen Guest")
         Spacer(modifier = Modifier.height(16.dp))
         when {
-            wantsToRegister -> RegisterView(
+            homeGuestUiState.wantsToRegister -> RegisterView(
                 onRegister = { email, password ->
                     viewModel.registerUserViaEmail(email, password, email) { success ->
                         val msg = if (success) "Logged in successfully" else "Login failed"
                         Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show()
                     }
                 },
-                onLogin = { wantsToRegister = false },
+                onLogin = { homeGuestViewModel.toggleWantsToRegister() },
                 isLoading = isLoading
             )
 
@@ -67,7 +65,7 @@ fun HomeGuest(
                         Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show()
                     }
                 },
-                onRegister = { wantsToRegister = true },
+                onRegister = { homeGuestViewModel.toggleWantsToRegister() },
                 isLoading = isLoading
             )
         }
