@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.maxiscoding.todoer.model.LoginRequest
 import dev.maxiscoding.todoer.model.RegisterRequest
 import dev.maxiscoding.todoer.repository.AuthRepository
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,6 +27,13 @@ class AppViewModel @Inject constructor(
 ) : ViewModel() {
     var uiState by mutableStateOf(AppState())
         private set
+
+    init {
+        viewModelScope.launch {
+            val token = authRepository.tokenFlow.firstOrNull()
+            setToken(token)
+        }
+    }
 
     fun registerUserViaEmail(
         email: String,
@@ -52,6 +60,7 @@ class AppViewModel @Inject constructor(
                         isLoading = false,
                         token = token
                     )
+                    setToken(token = token)
                     onFinish(null)
                 } else {
                     val msg = "Error with code: ${response.code()}"
@@ -89,10 +98,12 @@ class AppViewModel @Inject constructor(
                 if (response.isSuccessful) {
                     println("Success")
                     println(response)
+                    val token = response.body()?.token
                     uiState = uiState.copy(
                         isLoading = false,
-                        token = response.body()?.token
+                        token = token
                     )
+                    setToken(token = token)
                     onFinish(null)
                 } else {
                     val msg = "Error with code: ${response.code()}"
@@ -115,7 +126,15 @@ class AppViewModel @Inject constructor(
         }
     }
 
+    suspend fun setToken(token: String?) {
+        uiState = uiState.copy(token = token)
+        authRepository.setToken(token = token)
+    }
+
     fun logout() {
         uiState = uiState.copy(token = null)
+        viewModelScope.launch {
+            setToken(null)
+        }
     }
 }
