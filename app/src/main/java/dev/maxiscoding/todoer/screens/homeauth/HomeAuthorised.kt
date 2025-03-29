@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -19,24 +21,26 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import dev.maxiscoding.todoer.LocalAppViewModel
 
 @Composable
-fun HomeAuthorised() {
-    val homeAuthViewModel: HomeAuthViewModel = hiltViewModel()
+fun HomeAuthorised(homeAuthViewModel: HomeAuthViewModel = hiltViewModel()) {
     val viewModel = LocalAppViewModel.current
     val token by viewModel.uiState::token
     val onLogout = viewModel::logout
 
+    val uiState = homeAuthViewModel.uiState
+    val user by remember { derivedStateOf { viewModel.uiState } }
+
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 48.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Home Screen Authorised")
+        Text("Home Screen Authorised", style = MaterialTheme.typography.headlineLarge)
+        Spacer(modifier = Modifier.height(48.dp))
         Box {
-
-            val user by remember { derivedStateOf { viewModel.uiState } }
-
             Text(text = "Hello, ${user.token}!")
         }
+        Spacer(modifier = Modifier.height(32.dp))
+        Text("My name is ${uiState.myName}")
         Spacer(modifier = Modifier.height(32.dp))
         Text("Token is $token")
         Spacer(modifier = Modifier.height(32.dp))

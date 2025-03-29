@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,8 +28,8 @@ fun HomeGuest(
 ) {
     val vm = LocalAppViewModel.current
     val uiState = vm.uiState
-    val isLoggedIn = uiState.isLoggedIn
-    val isLoading = uiState.isLoading
+    val isLoggedIn by uiState::isLoggedIn
+    val isLoading by uiState::isLoading
 
     val homeGuestUiState = homeGuestViewModel.uiState
 
@@ -42,10 +44,10 @@ fun HomeGuest(
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().padding(horizontal = 48.dp)
     ) {
-        Text("Home Screen Guest")
-        Spacer(modifier = Modifier.height(16.dp))
+        Text("Home Screen Guest", style = MaterialTheme.typography.headlineLarge)
+        Spacer(modifier = Modifier.height(48.dp))
         when {
             homeGuestUiState.wantsToRegister -> RegisterView(
                 vm = homeGuestViewModel,

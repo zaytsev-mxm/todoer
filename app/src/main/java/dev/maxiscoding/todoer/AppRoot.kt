@@ -38,7 +38,6 @@ fun AppRoot() {
         }
     }
 
-
     CompositionLocalProvider(
         LocalAppViewModel provides viewModel
     ) {
