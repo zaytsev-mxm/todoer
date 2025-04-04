@@ -16,7 +16,7 @@ import dev.maxiscoding.todoer.screens.homeguest.HomeGuestViewModel
 @Composable
 fun LoginView(
     vm: HomeGuestViewModel = hiltViewModel(),
-    onLogin: (String, String) -> Unit,
+    onLogin: () -> Unit,
     isLoading: Boolean
 ) {
     val uiState = vm.uiState
@@ -39,7 +39,7 @@ fun LoginView(
         )
         Spacer(modifier = Modifier.height(32.dp))
         Button(
-            onClick = { onLogin(login, password) },
+            onClick = { onLogin() },
             enabled = !isLoading
         ) {
             Text("Login")

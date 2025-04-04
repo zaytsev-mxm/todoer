@@ -3,13 +3,14 @@ package dev.maxiscoding.todoer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.maxiscoding.todoer.model.LoginRequest
 import dev.maxiscoding.todoer.model.RegisterRequest
 import dev.maxiscoding.todoer.repository.AuthRepository
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,8 +31,11 @@ class AppViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val token = authRepository.tokenFlow.firstOrNull()
-            setToken(token)
+            snapshotFlow { authRepository.token }
+                .distinctUntilChanged()
+                .collect { newToken ->
+                    setToken(newToken)
+                }
         }
     }
 

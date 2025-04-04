@@ -37,6 +37,7 @@ fun HomeGuest(
 
     LaunchedEffect(isLoggedIn) {
         if (isLoggedIn) {
+            println("gdsfgkjnsdfkjlghsdfjkhgjkdhsfgfjhsjshdffhjgfdjkhgdfsjh")
             onLoggedIn.invoke()
         }
     }
@@ -62,11 +63,9 @@ fun HomeGuest(
 
             else -> LoginView(
                 vm = homeGuestViewModel,
-                onLogin = { login, password ->
-                    vm.loginUserViaEmail(login, password) { error ->
-                        val msg = if (error == null) "Logged in successfully" else "Login failed: ${error.message}"
-                        Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show()
-                    }
+                onLogin = { homeGuestViewModel.loginUserViaEmail({ error ->
+                    val msg = if (error == null) "Logged in successfully" else "Login failed: ${error.message}"
+                    Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show()})
                 },
                 isLoading = isLoading
             )

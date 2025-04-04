@@ -1,6 +1,9 @@
 package dev.maxiscoding.todoer.repository
 
 import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.datastore.preferences.core.edit
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.maxiscoding.todoer.TOKEN_PREF
@@ -9,24 +12,39 @@ import dev.maxiscoding.todoer.model.LoginRequest
 import dev.maxiscoding.todoer.model.RegisterRequest
 import dev.maxiscoding.todoer.model.TokenResponse
 import dev.maxiscoding.todoer.services.ApiService
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class AuthRepository @Inject constructor(
     private val apiService: ApiService,
     @ApplicationContext private val context: Context
 ) {
     private val dataStore = context.dataStore
 
-    val tokenFlow: Flow<String?> = dataStore.data.map { preferences -> preferences[TOKEN_PREF] }
+    var token by mutableStateOf<String?>(null)
+
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            dataStore.data
+                .map { preferences -> preferences[TOKEN_PREF] }
+                .distinctUntilChanged()
+                .collect { value ->
+                    token = value
+                }
+        }
+    }
 
     suspend fun setToken(token: String?) {
         dataStore.edit { settings ->
             if (token == null) {
                 settings.remove(TOKEN_PREF)
-                return@edit
             } else {
                 settings[TOKEN_PREF] = token
             }

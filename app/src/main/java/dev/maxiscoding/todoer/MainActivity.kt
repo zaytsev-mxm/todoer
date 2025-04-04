@@ -48,7 +48,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private suspend fun checkLoginStatus(): Boolean {
-        authRepository.tokenFlow.first()
         delay(1000) // TODO: remove this delay after we add a custom loading to NavController
         return true
     }

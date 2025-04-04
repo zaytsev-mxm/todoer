@@ -11,7 +11,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class HomeAuthState(
-    val myName: String = ""
+    val myName: String = "",
+    val token: String? = null
 )
 
 @HiltViewModel
@@ -22,10 +23,9 @@ class HomeAuthViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            authRepository.tokenFlow.collect { token ->
-                val name = "_${token}_"
-                uiState = uiState.copy(myName = name)
-            }
+            val token = authRepository.token
+            val name = "_${token}_"
+            uiState = uiState.copy(myName = name, token = token)
         }
     }
 }
