@@ -19,6 +19,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 
 const val TAG = "LoginView"
 
@@ -58,7 +60,8 @@ fun LoginView(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done,
                 showKeyboardOnFocus = true,
-            )
+            ),
+            visualTransformation = PasswordVisualTransformation()
         )
         Spacer(modifier = Modifier.height(32.dp))
         Button(

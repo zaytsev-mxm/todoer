@@ -1,5 +1,6 @@
 package dev.maxiscoding.todoer.screens.homeguest
 
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -14,6 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+const val TAG_VM = "HomeGuestViewModel"
 
 @HiltViewModel
 class HomeGuestViewModel @Inject constructor(
@@ -56,15 +59,15 @@ class HomeGuestViewModel @Inject constructor(
             val response = authRepository.loginUserViaEmail(request)
 
             if (response.isSuccessful) {
-                println("Success")
-                println(response)
+                Log.i(TAG_VM, "Logged in successfully")
+                Log.d(TAG_VM, response.body().toString())
                 val token = response.body()?.token
                 authRepository.setToken(token)
                 onFinish(null)
                 Toast.makeText(context, "Logged in successfully", Toast.LENGTH_SHORT).show()
             } else {
                 val msg = "Error with code: ${response.code()}"
-                println(msg)
+                Log.e(TAG_VM, msg)
                 authRepository.setToken(null)
                 onFinish(Exception("web error: $msg"))
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()

@@ -8,4 +8,5 @@ data class Token(
     val token: String,
 ): Parcelable
 
-data class TokenResponse(val token: String)
+@Parcelize
+data class TokenResponse(val token: String): Parcelable
