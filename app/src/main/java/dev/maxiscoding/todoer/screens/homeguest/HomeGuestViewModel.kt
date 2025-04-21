@@ -1,9 +1,11 @@
 package dev.maxiscoding.todoer.screens.homeguest
 
+import android.widget.Toast
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.maxiscoding.todoer.model.LoginRequest
 import dev.maxiscoding.todoer.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeGuestViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    val authRepository: AuthRepository
+    val authRepository: AuthRepository,
+    @ApplicationContext private val context: android.content.Context,
 ) : ViewModel() {
     companion object {
         private const val KEY_UI_STATE = "ui_state_home_guest_view_model"
@@ -58,11 +61,13 @@ class HomeGuestViewModel @Inject constructor(
                 val token = response.body()?.token
                 authRepository.setToken(token)
                 onFinish(null)
+                Toast.makeText(context, "Logged in successfully", Toast.LENGTH_SHORT).show()
             } else {
                 val msg = "Error with code: ${response.code()}"
                 println(msg)
                 authRepository.setToken(null)
                 onFinish(Exception("web error: $msg"))
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
             }
         }
     }
