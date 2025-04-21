@@ -10,18 +10,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import dev.maxiscoding.todoer.repository.AuthRepository
 import dev.maxiscoding.todoer.screens.debug.Debug
 import dev.maxiscoding.todoer.screens.homeauth.HomeAuthorised
 import dev.maxiscoding.todoer.screens.homeguest.HomeGuest
 import dev.maxiscoding.todoer.ui.theme.ToDoErTheme
-import javax.inject.Inject
 
 sealed class Screen(val route: String) {
     data object HomeGuest : Screen("HomeGuest")
@@ -29,7 +26,7 @@ sealed class Screen(val route: String) {
     data object Debug : Screen("Debug")
 }
 
-val DefaultRoute = Screen.Debug.route
+val DefaultRoute = Screen.HomeGuest.route
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -48,9 +45,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             NavHost(navController = navController, startDestination = DefaultRoute) {
                                 composable(Screen.HomeGuest.route) {
-                                    HomeGuest {
-                                        navController.navigate(Screen.HomeAuthorised.route)
-                                    }
+                                    HomeGuest()
                                 }
                                 composable(Screen.HomeAuthorised.route) {
                                     HomeAuthorised()

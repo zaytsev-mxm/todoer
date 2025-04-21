@@ -8,18 +8,20 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.maxiscoding.todoer.screens.homeguest.HomeGuestViewModel
+import androidx.compose.runtime.getValue
 
 @Composable
 fun RegisterView(
-    vm: HomeGuestViewModel = hiltViewModel(),
+    viewModel: HomeGuestViewModel = hiltViewModel(),
     onRegister: (String, String) -> Unit,
     isLoading: Boolean
 ) {
-    val uiState = vm.uiState
+    val uiState by viewModel.uiState.collectAsState()
     val registerForm = uiState.registerForm
     val email = registerForm.email
     val password = registerForm.password
@@ -29,12 +31,12 @@ fun RegisterView(
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = email,
-            onValueChange = { vm.updateRegisterForm(registerForm.copy(email = it)) },
+            onValueChange = { viewModel.updateRegisterForm(registerForm.copy(email = it)) },
             label = { Text("Email") }
         )
         OutlinedTextField(
             value = password,
-            onValueChange = { vm.updateRegisterForm(registerForm.copy(password = it)) },
+            onValueChange = { viewModel.updateRegisterForm(registerForm.copy(password = it)) },
             label = { Text("Password") }
         )
         Spacer(modifier = Modifier.height(32.dp))
@@ -44,6 +46,6 @@ fun RegisterView(
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Already have an account? Login",
-            modifier = Modifier.clickable { vm.toggleWantsToRegister() })
+            modifier = Modifier.clickable { viewModel.toggleWantsToRegister() })
     }
 }

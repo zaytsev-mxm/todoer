@@ -1,6 +1,6 @@
 package dev.maxiscoding.todoer.screens.homeguest
 
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,37 +10,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.maxiscoding.todoer.components.authorisation.LoginView
 import dev.maxiscoding.todoer.components.authorisation.RegisterView
-import dev.maxiscoding.todoer.LocalAppViewModel
-import dev.maxiscoding.todoer.isLoggedIn
+import androidx.compose.runtime.getValue
+
+const val TAG = "HomeGuest"
 
 @Composable
 fun HomeGuest(
-    homeGuestViewModel: HomeGuestViewModel = hiltViewModel(),
-    onLoggedIn: () -> Unit
+    homeGuestViewModel: HomeGuestViewModel = hiltViewModel()
 ) {
-    val vm = LocalAppViewModel.current
-    val uiState = vm.uiState
-    val isLoggedIn by uiState::isLoggedIn
-    val isLoading by uiState::isLoading
-
-    val homeGuestUiState = homeGuestViewModel.uiState
-
-    val myContext = LocalContext.current
-
-    LaunchedEffect(isLoggedIn) {
-        if (isLoggedIn) {
-            println("gdsfgkjnsdfkjlghsdfjkhgjkdhsfgfjhsjshdffhjgfdjkhgdfsjh")
-            onLoggedIn.invoke()
-        }
-    }
+    val uiState by homeGuestViewModel.uiState.collectAsState()
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -50,24 +35,18 @@ fun HomeGuest(
         Text("Home Screen Guest", style = MaterialTheme.typography.headlineLarge)
         Spacer(modifier = Modifier.height(48.dp))
         when {
-            homeGuestUiState.wantsToRegister -> RegisterView(
-                vm = homeGuestViewModel,
+            uiState.wantsToRegister -> RegisterView(
                 onRegister = { email, password ->
-                    vm.registerUserViaEmail(email, password, email) { error ->
-                        val msg = if (error == null) "Logged in successfully" else "Login failed: ${error.message}"
-                        Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show()
-                    }
+                    Log.d(TAG, "Registering user with email: $email and password: $password")
                 },
-                isLoading = isLoading
+                isLoading = false
             )
 
             else -> LoginView(
-                vm = homeGuestViewModel,
-                onLogin = { homeGuestViewModel.loginUserViaEmail({ error ->
-                    val msg = if (error == null) "Logged in successfully" else "Login failed: ${error.message}"
-                    Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show()})
+                onLogin = {
+                    Log.d(TAG, "Logging in user")
                 },
-                isLoading = isLoading
+                isLoading = false
             )
         }
     }

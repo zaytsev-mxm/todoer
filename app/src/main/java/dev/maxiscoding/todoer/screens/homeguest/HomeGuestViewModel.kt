@@ -1,55 +1,54 @@
 package dev.maxiscoding.todoer.screens.homeguest
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.maxiscoding.todoer.model.LoginRequest
 import dev.maxiscoding.todoer.repository.AuthRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class LoginForm(
-    val email: String = "",
-    val login: String = "",
-    val password: String = "",
-)
-
-data class RegisterForm(
-    val email: String = "",
-    val login: String = "",
-    val password: String = "",
-)
-
-data class HomeGuestState(
-    val wantsToRegister: Boolean = false,
-    val loginForm: LoginForm = LoginForm(),
-    val registerForm: RegisterForm = RegisterForm(),
-)
-
 @HiltViewModel
 class HomeGuestViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     val authRepository: AuthRepository
 ) : ViewModel() {
-    var uiState by mutableStateOf(HomeGuestState())
-        private set
+    companion object {
+        private const val KEY_UI_STATE = "ui_state_home_guest_view_model"
+    }
+
+    private val _uiState = MutableStateFlow(
+        savedStateHandle[KEY_UI_STATE] ?: HomeGuestState()
+    )
+    val uiState: StateFlow<HomeGuestState> = _uiState.asStateFlow()
+
+    private fun updateState(reducer: (HomeGuestState) -> HomeGuestState) {
+        _uiState.update { current ->
+            val updated = reducer(current)
+            savedStateHandle[KEY_UI_STATE] = updated
+            updated
+        }
+    }
 
     fun toggleWantsToRegister() {
-        uiState = uiState.copy(wantsToRegister = !uiState.wantsToRegister)
+        updateState({ it.copy(wantsToRegister = !it.wantsToRegister) })
     }
 
     fun updateLoginForm(loginForm: LoginForm) {
-        uiState = uiState.copy(loginForm = loginForm)
+        updateState({ it.copy(loginForm = loginForm) })
     }
 
     fun updateRegisterForm(registerForm: RegisterForm) {
-        uiState = uiState.copy(registerForm = registerForm)
+        updateState({ it.copy(registerForm = registerForm) })
     }
 
     fun loginUserViaEmail(onFinish: (e: Exception?) -> Unit = {}) {
-        val request = LoginRequest(uiState.loginForm.login, uiState.loginForm.password)
+        val request = LoginRequest(uiState.value.loginForm.login, uiState.value.loginForm.password)
         viewModelScope.launch {
             val response = authRepository.loginUserViaEmail(request)
 
