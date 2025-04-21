@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             NavHost(navController = navController, startDestination = DefaultRoute) {
                                 composable(Screen.HomeGuest.route) {
-                                    HomeGuest()
+                                    HomeGuest(onLogin = { navController.navigate(Screen.HomeAuthorised.route) })
                                 }
                                 composable(Screen.HomeAuthorised.route) {
                                     HomeAuthorised()

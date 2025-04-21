@@ -23,7 +23,8 @@ const val TAG = "HomeGuest"
 
 @Composable
 fun HomeGuest(
-    homeGuestViewModel: HomeGuestViewModel = hiltViewModel()
+    homeGuestViewModel: HomeGuestViewModel = hiltViewModel(),
+    onLogin: () -> Unit
 ) {
     val uiState by homeGuestViewModel.uiState.collectAsState()
 
@@ -43,9 +44,7 @@ fun HomeGuest(
             )
 
             else -> LoginView(
-                onLogin = {
-                    Log.d(TAG, "Logging in user")
-                },
+                onLogin = { onLogin() },
                 isLoading = false
             )
         }
