@@ -1,39 +1,48 @@
 package dev.maxiscoding.todoer
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
+import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.maxiscoding.todoer.model.LoginRequest
 import dev.maxiscoding.todoer.model.RegisterRequest
 import dev.maxiscoding.todoer.repository.AuthRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class AppState(
-    var isLoading: Boolean = false,
-    val token: String? = null,
-    val error: String? = null
-)
-
-val AppState.isLoggedIn: Boolean get() = token != null && error == null
-
 @HiltViewModel
 class AppViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    var uiState by mutableStateOf(AppState())
-        private set
+    companion object {
+        private const val KEY_UI_STATE = "ui_state_app_view_model"
+    }
+
+    private val _uiState = MutableStateFlow(
+        savedStateHandle[KEY_UI_STATE] ?: AppState()
+    )
+    val uiState: StateFlow<AppState> = _uiState.asStateFlow()
+
+    private fun updateState(reducer: (AppState) -> AppState) {
+        _uiState.update { current ->
+            val updated = reducer(current)
+            savedStateHandle[KEY_UI_STATE] = updated
+            updated
+        }
+    }
 
     init {
         viewModelScope.launch {
-            snapshotFlow { authRepository.token }
+            authRepository.observeTokenFlow()
                 .distinctUntilChanged()
                 .collect { newToken ->
+                    Log.d(TAG, "Token is: $newToken")
                     setToken(newToken)
                 }
         }
@@ -45,7 +54,7 @@ class AppViewModel @Inject constructor(
         login: String? = null,
         onFinish: (e: Exception?) -> Unit = {}
     ) {
-        uiState = uiState.copy(isLoading = true)
+        updateState { it.copy(isLoading = true) }
 
         viewModelScope.launch {
             try {
@@ -60,85 +69,32 @@ class AppViewModel @Inject constructor(
                     println("Success")
                     println(response)
                     val token = response.body()?.token
-                    uiState = uiState.copy(
-                        isLoading = false,
-                        token = token
-                    )
+                    updateState { it.copy(isLoading = false, token = token) }
                     setToken(token = token)
                     onFinish(null)
                 } else {
                     val msg = "Error with code: ${response.code()}"
                     println(msg)
-                    uiState = uiState.copy(
-                        isLoading = false,
-                        error = msg
-                    )
+                    updateState { it.copy(isLoading = false, error = msg) }
                     onFinish(Exception("web error: $msg"))
                 }
             } catch (e: Exception) {
                 println("Error unknown: ${e.message}")
                 println(e.message)
-                uiState = uiState.copy(
-                    isLoading = false,
-                    error = e.message
-                )
-                onFinish(e)
-            }
-        }
-    }
-
-    fun loginUserViaEmail(
-        login: String,
-        password: String,
-        onFinish: (e: Exception?) -> Unit = {}
-    ) {
-        uiState = uiState.copy(isLoading = true)
-
-        viewModelScope.launch {
-            try {
-                val request = LoginRequest(login.trim(), password.trim())
-                val response = authRepository.loginUserViaEmail(request)
-
-                if (response.isSuccessful) {
-                    println("Success")
-                    println(response)
-                    val token = response.body()?.token
-                    uiState = uiState.copy(
-                        isLoading = false,
-                        token = token
-                    )
-                    setToken(token = token)
-                    onFinish(null)
-                } else {
-                    val msg = "Error with code: ${response.code()}"
-                    println(msg)
-                    uiState = uiState.copy(
-                        isLoading = false,
-                        error = msg
-                    )
-                    onFinish(Exception("web error: $msg"))
-                }
-            } catch (e: Exception) {
-                println("Error unknown: ${e.message}")
-                println(e.message)
-                uiState = uiState.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                updateState { it.copy(isLoading = false, error = e.message) }
                 onFinish(e)
             }
         }
     }
 
     suspend fun setToken(token: String?) {
-        uiState = uiState.copy(token = token)
+        updateState { it.copy(token = token) }
         authRepository.setToken(token = token)
     }
 
     fun logout() {
-        uiState = uiState.copy(token = null)
         viewModelScope.launch {
-            setToken(null)
+            authRepository.setToken(null)
         }
     }
 }
