@@ -18,15 +18,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import dev.maxiscoding.todoer.components.authorisation.LoginView
 import dev.maxiscoding.todoer.components.authorisation.RegisterView
 import androidx.compose.runtime.getValue
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import dev.maxiscoding.todoer.Screen
 
 const val TAG = "HomeGuest"
 
 @Composable
 fun HomeGuest(
-    homeGuestViewModel: HomeGuestViewModel = hiltViewModel(),
-    onLogin: () -> Unit
+    viewModel: HomeGuestViewModel = hiltViewModel(),
+    navController: NavController = rememberNavController()
 ) {
-    val uiState by homeGuestViewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -44,7 +47,7 @@ fun HomeGuest(
             )
 
             else -> LoginView(
-                onLogin = { onLogin() },
+                onLogin = { navController.navigate(Screen.HomeAuthorised.route) },
                 isLoading = false
             )
         }
