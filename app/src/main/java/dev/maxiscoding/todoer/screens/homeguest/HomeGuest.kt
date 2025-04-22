@@ -46,10 +46,7 @@ fun HomeGuest(
                 isLoading = false
             )
 
-            else -> LoginView(
-                onLogin = { navController.navigate(Screen.HomeAuthorised.route) },
-                isLoading = false
-            )
+            else -> LoginView { navController.navigate(Screen.HomeAuthorised.route) }
         }
     }
 }

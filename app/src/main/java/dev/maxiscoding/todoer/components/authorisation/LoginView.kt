@@ -27,8 +27,7 @@ const val TAG = "LoginView"
 @Composable
 fun LoginView(
     viewModel: HomeGuestViewModel = hiltViewModel(),
-    onLogin: () -> Unit,
-    isLoading: Boolean
+    onLogin: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val loginForm = uiState.loginForm
@@ -75,7 +74,7 @@ fun LoginView(
                     }
                 }
             },
-            enabled = !isLoading
+            enabled = !uiState.isLoading
         ) {
             Text("Login")
         }

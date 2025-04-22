@@ -19,6 +19,7 @@ data class RegisterForm(
 
 @Parcelize
 data class HomeGuestState(
+    val isLoading: Boolean = false,
     val wantsToRegister: Boolean = false,
     val loginForm: LoginForm = LoginForm(),
     val registerForm: RegisterForm = RegisterForm(),

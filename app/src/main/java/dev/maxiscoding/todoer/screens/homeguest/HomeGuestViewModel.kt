@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.maxiscoding.todoer.model.LoginRequest
 import dev.maxiscoding.todoer.repository.AuthRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,8 +56,17 @@ class HomeGuestViewModel @Inject constructor(
 
     fun loginUserViaEmail(onFinish: (e: Exception?) -> Unit = {}) {
         val request = LoginRequest(uiState.value.loginForm.login, uiState.value.loginForm.password)
+
+        updateState({ it.copy(isLoading = true) })
+
         viewModelScope.launch {
             val response = authRepository.loginUserViaEmail(request)
+
+            // Emulate a slow network connection
+            // to see the loading state
+            delay(2 * 1000)
+
+            updateState({ it.copy(isLoading = false) })
 
             if (response.isSuccessful) {
                 Log.i(TAG_VM, "Logged in successfully")
