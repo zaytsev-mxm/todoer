@@ -28,6 +28,8 @@ sealed class Screen(val route: String) {
 
 val DefaultRoute = Screen.HomeGuest.route
 
+// TODO(test)
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
