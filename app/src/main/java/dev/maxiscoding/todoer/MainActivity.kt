@@ -24,7 +24,10 @@ import dev.maxiscoding.todoer.ui.theme.ToDoErTheme
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.currentBackStackEntryAsState
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 sealed class Screen(val route: String) {
@@ -59,6 +62,7 @@ class MainActivity : ComponentActivity() {
                     Box(modifier = Modifier.padding(innerPadding)) {
                         val viewModel: AppViewModel = hiltViewModel()
                         val navController = rememberNavController()
+                        val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
                         CompositionLocalProvider(
                             LocalAppViewModel provides viewModel
@@ -88,6 +92,21 @@ class MainActivity : ComponentActivity() {
                                 composable(Screen.Debug.route) {
                                     Debug()
                                 }
+                            }
+
+                            LaunchedEffect(Unit) {
+                                viewModel.uiState
+                                    .map { it.token }
+                                    .distinctUntilChanged()
+                                    .collect { token ->
+                                        if (token == null &&
+                                            currentBackStackEntry?.destination?.route != Screen.HomeGuest.route
+                                        ) {
+                                            navController.navigate(Screen.HomeGuest.route) {
+                                                popUpTo(0)
+                                            }
+                                        }
+                                    }
                             }
                         }
                     }
