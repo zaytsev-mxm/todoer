@@ -22,6 +22,10 @@ import dev.maxiscoding.todoer.screens.homeauth.HomeAuth
 import dev.maxiscoding.todoer.screens.homeguest.HomeGuest
 import dev.maxiscoding.todoer.ui.theme.ToDoErTheme
 import androidx.compose.runtime.getValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 sealed class Screen(val route: String) {
     data object Startup : Screen("Startup")
@@ -36,8 +40,18 @@ const val TAG = "ToDoEr"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private var isAppReady = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { !isAppReady }
+
+        lifecycleScope.launch {
+            isAppReady = checkLoginStatus()
+        }
+
         enableEdgeToEdge()
         setContent {
             ToDoErTheme {
@@ -80,5 +94,12 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private suspend fun checkLoginStatus(): Boolean {
+        // the next line emulates a delay for the login status checks
+        // TODO(later, add a real check for the login status)
+        delay(1000)
+        return true
     }
 }
