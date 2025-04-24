@@ -24,12 +24,13 @@ import dev.maxiscoding.todoer.ui.theme.ToDoErTheme
 import androidx.compose.runtime.getValue
 
 sealed class Screen(val route: String) {
+    data object Startup : Screen("Startup")
     data object HomeGuest : Screen("HomeGuest")
     data object HomeAuthorised : Screen("HomeAuthorised")
     data object Debug : Screen("Debug")
 }
 
-val DefaultRoute = Screen.HomeGuest.route
+val DefaultRoute = Screen.Startup.route
 
 const val TAG = "ToDoEr"
 
@@ -45,23 +46,25 @@ class MainActivity : ComponentActivity() {
                         val viewModel: AppViewModel = hiltViewModel()
                         val navController = rememberNavController()
 
-                        // If you un-comment the below, it will cause a recomposition issue:
-                        // When you type something in the login form and rotate the phone,
-                        // the entered values are lost
-                        /*val uiState by viewModel.uiState.collectAsState()
-
-                        LaunchedEffect(uiState.token) {
-                            if (uiState.token != null) {
-                                navController.navigate(Screen.HomeAuthorised.route)
-                            } else {
-                                navController.navigate(Screen.HomeGuest.route)
-                            }
-                        }*/
-
                         CompositionLocalProvider(
                             LocalAppViewModel provides viewModel
                         ) {
                             NavHost(navController = navController, startDestination = DefaultRoute) {
+                                composable(Screen.Startup.route) {
+                                    val uiState by viewModel.uiState.collectAsState()
+
+                                    LaunchedEffect(uiState.token) {
+                                        if (uiState.token != null) {
+                                            navController.navigate(Screen.HomeAuthorised.route) {
+                                                popUpTo(Screen.Startup.route) { inclusive = true }
+                                            }
+                                        } else {
+                                            navController.navigate(Screen.HomeGuest.route) {
+                                                popUpTo(Screen.Startup.route) { inclusive = true }
+                                            }
+                                        }
+                                    }
+                                }
                                 composable(Screen.HomeGuest.route) {
                                     HomeGuest(navController = navController)
                                 }
