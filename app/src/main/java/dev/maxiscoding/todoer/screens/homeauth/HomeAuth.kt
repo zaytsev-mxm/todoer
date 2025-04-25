@@ -10,17 +10,16 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import dev.maxiscoding.todoer.LocalAppViewModel
+import androidx.compose.runtime.getValue
 
 @Composable
-fun HomeAuthorised(homeAuthViewModel: HomeAuthViewModel = hiltViewModel()) {
-    val onLogout = LocalAppViewModel.current::logout
-
-    val uiState = homeAuthViewModel.uiState
+fun HomeAuth(viewModel: HomeAuthViewModel = hiltViewModel()) {
+    val uiState by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = 48.dp),
@@ -31,7 +30,7 @@ fun HomeAuthorised(homeAuthViewModel: HomeAuthViewModel = hiltViewModel()) {
         Spacer(modifier = Modifier.height(48.dp))
         Text("Hello, ${uiState.token}!")
         Spacer(modifier = Modifier.height(32.dp))
-        Button(onClick = { onLogout.invoke() }) {
+        Button(onClick = { viewModel.logout() }) {
             Text("Logout")
         }
     }

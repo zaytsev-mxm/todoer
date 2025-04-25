@@ -20,9 +20,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import dev.maxiscoding.todoer.TAG
 
-const val TAG = "LoginView"
+const val TAG_LOGIN_VIEW = "LoginView"
 
 @Composable
 fun LoginView(

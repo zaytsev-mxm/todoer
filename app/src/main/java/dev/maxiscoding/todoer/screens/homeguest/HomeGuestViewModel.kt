@@ -60,11 +60,11 @@ class HomeGuestViewModel @Inject constructor(
         updateState({ it.copy(isLoading = true) })
 
         viewModelScope.launch {
-            val response = authRepository.loginUserViaEmail(request)
-
             // Emulate a slow network connection
             // to see the loading state
             delay(2 * 1000)
+
+            val response = authRepository.loginUserViaEmail(request)
 
             updateState({ it.copy(isLoading = false) })
 
