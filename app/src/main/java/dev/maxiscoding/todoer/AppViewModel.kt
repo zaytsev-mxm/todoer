@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.maxiscoding.todoer.model.RegisterRequest
 import dev.maxiscoding.todoer.repository.AuthRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,6 +45,7 @@ class AppViewModel @Inject constructor(
                 .collect { newToken ->
                     Log.d(TAG, "Token is: $newToken")
                     setToken(newToken)
+                    updateState { it.copy(hasInitialDataReceived = true) }
                 }
         }
     }

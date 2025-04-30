@@ -7,5 +7,6 @@ import kotlinx.parcelize.Parcelize
 data class AppState(
     var isLoading: Boolean = false,
     val token: String? = null,
-    val error: String? = null
+    val error: String? = null,
+    val hasInitialDataReceived: Boolean = false,
 ): Parcelable
