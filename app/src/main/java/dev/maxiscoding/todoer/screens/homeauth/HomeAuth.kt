@@ -31,7 +31,7 @@ fun HomeAuth(viewModel: HomeAuthViewModel = hiltViewModel()) {
         Text("Hello, ${uiState.token}!")
         Spacer(modifier = Modifier.height(32.dp))
         Button(onClick = { viewModel.logout() }) {
-            Text("Logout!")
+            Text("Logout;")
         }
     }
 }
