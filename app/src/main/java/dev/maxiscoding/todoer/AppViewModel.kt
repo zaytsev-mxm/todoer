@@ -44,6 +44,7 @@ class AppViewModel @Inject constructor(
                 .collect { newToken ->
                     Log.d(TAG, "Token is: $newToken")
                     setToken(newToken)
+                    updateState { it.copy(hasInitialDataReceived = true) }
                 }
         }
     }

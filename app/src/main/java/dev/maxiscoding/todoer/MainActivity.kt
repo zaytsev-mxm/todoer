@@ -29,6 +29,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import androidx.activity.viewModels
 
 sealed class Screen(val route: String) {
     data object Startup : Screen("Startup")
@@ -45,6 +46,8 @@ const val TAG = "ToDoEr"
 class MainActivity : ComponentActivity() {
     private var isAppReady = false
 
+    private val viewModel: AppViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -52,7 +55,11 @@ class MainActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition { !isAppReady }
 
         lifecycleScope.launch {
-            isAppReady = checkLoginStatus()
+            viewModel.uiState.map {
+                it.hasInitialDataReceived
+            }.collect { value ->
+                isAppReady = value
+            }
         }
 
         enableEdgeToEdge()
@@ -67,7 +74,10 @@ class MainActivity : ComponentActivity() {
                         CompositionLocalProvider(
                             LocalAppViewModel provides viewModel
                         ) {
-                            NavHost(navController = navController, startDestination = DefaultRoute) {
+                            NavHost(
+                                navController = navController,
+                                startDestination = DefaultRoute
+                            ) {
                                 composable(Screen.Startup.route) {
                                     val uiState by viewModel.uiState.collectAsState()
 
@@ -113,12 +123,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    private suspend fun checkLoginStatus(): Boolean {
-        // the next line emulates a delay for the login status checks
-        // TODO(later, add a real check for the login status)
-        delay(1000)
-        return true
     }
 }
