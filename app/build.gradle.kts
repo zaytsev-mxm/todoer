@@ -28,6 +28,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "BASE_URL", "\"https://maxiscoding.dev/todolist/api/v1.0/\"")
+        }
+        debug {
+            buildConfigField("String", "BASE_URL", "\"https://maxiscoding.dev/todolist/api/v1.0/\"")
         }
     }
     compileOptions {
@@ -39,6 +43,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
